@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    
+      <table id="toptable"  data-bind="visible: TotalItemSummaryCount() > 0" style="display: none;width:90%" cellspacing="0" cellpadding="0">
+   
+    <tr>
+        <td id="tableleft"  style="vertical-align: text-top" >
+            <table class="grid1">
+                <thead>
+                    <tr>
+                        <th> <img src="../images/excel_icon.gif" style="cursor: pointer;" width="15" height="15" title="Export Invoice Summary to Excel" data-bind="click: excelDownload" /></th>
+                        <th style="text-align: left;">
+                            <a href="#" class="SortField NoSort" data-bind="click: function (data, event) { sortsummary('name', data, event) }">Instructor</a>
+                        </th>
+                        <th>
+                            Comment
+                        </th>
+                        <th style="text-align: left;">
+
+                            <span data-bind="visible:DisplayMode()!='DOL'"> <a href="#" class="SortField NoSort" data-bind="click: function (data, event) { sortsummary('r', data, event) }">Reserved</a> </span>
+                            <span data-bind="visible:DisplayMode()=='DOL'"> Stipend </span>
+                        </th>
+
+                        <th data-bind="foreach: DynamicColumns" style="white-space:nowrap"> 
+                            
+                               <span class="dynthspan">
+                                      <span data-bind="text: Month"></span>-<span data-bind="text: Year"></span>
+                                </span>
+                            
+                        </th>
+                        <th>
+                            Grand Total
+                        </th>
+                    </tr>
+                </thead>
+                <tbody data-bind="foreach: NoLaginvoiceLoadAssignments">
+                    <tr data-bind="css: {even: ($index()) % 2 }">
+                        <td style="padding: 3px;">
+                            <input type="checkbox" class="studentCheckbox" data-bind="visible: InstructorID() > 0" />
+                        </td>
+                        <td>
+                            <span data-bind="visible: InstructorID() > 0"><a data-bind="attr: { href: '/Student/List?InstructorID=' + InstructorID()}, text:InstructorName" target="_blank"></a><a class="smallitalic" data-bind="attr: { href: '/Invoice/myInvoiceDaily?InstructorID=' + InstructorID()}" target="_blank" title="view as instructor"> v</a></span>
+                            <span data-bind="visible: InstructorID() < 0, text: InstructorName"></span>
+                        </td>
+                        <td>
+                            <a style="cursor:pointer;" href="#" data-bind="text: Comments() ? (Comments().length > 30 ? Comments().slice(0, 30) + '.....' : Comments()) :  '', click: function () {$parent.addComments(InstructorID(), InstructorName(), Comments())}, attr: {title: Comments }"></a>
+                            <img style="cursor:pointer;" title="Add Comment" src="../images/addEdit.png" data-bind="visible: InstructorID() > 0 && !Comments() , click: function () {$parent.addComments(InstructorID(), InstructorName(), Comments())}" />
+                        </td>
+                        <td>
+
+                            <span data-bind="visible: (InstructorID() > 0)&&($root.DisplayMode()!='DOL')"><a data-bind="attr: { href: '/Process/List?InstructorID=' + InstructorID()+ '&ReservedType=1'}" target="_blank"><span data-bind=" text: TotalReserved" class="dyntdspan"></span></a></span>
+                            <span data-bind="visible: (InstructorID()< 0)&&($root.DisplayMode()!='DOL'), text: TotalReserved" class="dyntdspan"></span>
+                            <span data-bind="visible: (InstructorID() > 0)&&($root.DisplayMode()=='DOL'), currency:Stipend"></span>
+                        </td>
+                        <td data-bind="foreach: MonthBuckets" class="dyntd" style="white-space:nowrap">
+                            <span data-bind="visible: ($parent.InstructorID()>0) && ( $root.DisplayMode()=='NEW')"><a data-bind="attr: { href: '/Invoice/List?InstructorID=' + $parent.InstructorID() +'&m='+ Month + '&y='+Year}" target="_blank"><span data-bind=" text: TotalAssignments" class="dyntdspan"></span></a></span>
+                            <span data-bind="visible: ($parent.InstructorID()>0) && ( $root.DisplayMode()=='DAY')"><a data-bind="click:  function(data, event) {$root.DayDetail($parent.InstructorID(),$parent.InstructorName(),$parent.Stipend(), Bonus, CoachCoverage, Month,Year,0,event)}"><span data-bind="commaNumber: TotalAssignments " class="dyntdspan"></span></a></span>
+                            <span data-bind="css:{'dynbonus':( Bonus>0 || CoachCoverage>0)},visible: ($parent.InstructorID()>0) && ( $root.DisplayMode()=='DOL')"><a data-bind="click:  function(data, event) {$root.DayDetail($parent.InstructorID(),$parent.InstructorName(),$parent.Stipend(), Bonus, CoachCoverage, Month,Year, 0, event)}"> <span data-bind="currency: TotalPay" class="dyntdspan"></span></a></span>
+                            <span data-bind="visible: $parent.InstructorID() < 0"><a data-bind="attr: { href: '/NonResponders/NonRespondersDetails?m='+ Month + '&y='+Year}" target="_blank"><span data-bind="text: TotalAssignments" class="dyntdspan"></span></a></span>
+                        </td>
+                        <td>
+                            <span data-bind="visible: ($root.DisplayMode()!='DOL') || (InstructorID()<0) , commaNumber: GrandTotal" class="dyntdspan"></span>
+                            <span data-bind="visible: ($root.DisplayMode() =='DOL') && (InstructorID()>0) , currency: GrandTotal" class="dyntdspan"></span>
+
+
+                        </td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td style="padding: 3px;"></td>
+                        <td style="padding: 3px;">
+                            Grand Totals:
+                        </td>
+                        <td colspan="2"></td>
+                        <td data-bind="foreach: DynamicColumns" class="dyntd">
+                            <span class="dyntdspan">
+                                <span data-bind="visible: $root.DisplayMode()!='DOL',commaNumber: GT"></span>
+                                <span data-bind="visible: $root.DisplayMode()=='DOL',currency: GT"></span>
+                            </span>
+                        </td>
+                        <td>
+                            <span class="dyntdspan" data-bind="visible: DisplayMode()!='DOL', commaNumber:grandTotal()"></span>
+                            <span class="dyntdspan" data-bind="visible: DisplayMode()=='DOL', currency:grandTotal()"></span>
+
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+          </td>
+    
