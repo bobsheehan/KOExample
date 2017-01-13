@@ -1,10 +1,10 @@
 # Knockout example - dynamic row/column table
 The dynamic (columns & row)  table has the following requirement. For each unique coach in the JSON, 
 
- 1) total up the number of reserved students
- 2) show the total number of students for each month of the selected date range. If zero then show zero (not blank or empty)
- 3) total up just  #2
- 4) total the columns for #2 only
+ 1. total up the number of reserved students
+ 2. show the total number of students for each month of the selected date range. If zero then show zero (not blank or empty)
+ 3. total up just  #2
+ 4. total the columns for #2 only
  
 
 My original approach was to build an observable array of dates (so for example, if your date range was Jan through March then that array would have 3 nodes (Jan/Feb/March). Then I would iterate each row in the JSON
